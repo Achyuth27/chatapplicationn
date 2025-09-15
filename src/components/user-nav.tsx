@@ -11,15 +11,21 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { UserAvatar } from './user-avatar';
-import { logout } from '@/lib/actions';
 import type { User } from '@/lib/types';
 import { LogOut, User as UserIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface UserNavProps {
     user: User;
 }
 
 export function UserNav({ user }: UserNavProps) {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    router.push('/logout');
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,14 +48,10 @@ export function UserNav({ user }: UserNavProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <form action={logout} className="w-full">
-            <DropdownMenuItem asChild>
-                <button type="submit" className="w-full">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                </button>
-            </DropdownMenuItem>
-        </form>
+        <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

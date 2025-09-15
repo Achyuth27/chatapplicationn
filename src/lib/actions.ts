@@ -108,8 +108,3 @@ export async function signup(prevState: any, formData: FormData) {
 
     redirect('/');
 }
-
-export async function logout() {
-  cookies().delete('auth-token');
-  redirect('/login');
-}
