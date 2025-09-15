@@ -18,7 +18,7 @@ export default async function Home() {
   if (!loggedInUser) {
     // This case might happen if the user was deleted but the cookie remains.
     // We can't delete the cookie here, so we redirect to logout which can.
-    redirect('/login');
+    redirect('/logout');
   }
 
   return (
