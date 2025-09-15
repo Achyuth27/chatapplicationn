@@ -13,9 +13,10 @@ interface ChatWindowProps {
   messages: Message[];
   currentUser: User;
   onSendMessage: (content: string) => void;
+  allUsers: User[];
 }
 
-export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage }: ChatWindowProps) {
+export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage, allUsers }: ChatWindowProps) {
     const scrollAreaRef = React.useRef<HTMLDivElement>(null);
     const viewportRef = React.useRef<HTMLDivElement>(null);
 
@@ -52,7 +53,7 @@ export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage 
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
         <div className="p-4 space-y-4">
           {messages.map((message) => (
-            <ChatMessage key={message.id} message={message} currentUser={currentUser} />
+            <ChatMessage key={message.id} message={message} currentUser={currentUser} allUsers={allUsers} />
           ))}
         </div>
       </ScrollArea>

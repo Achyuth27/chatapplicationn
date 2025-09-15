@@ -6,7 +6,7 @@ import { ContactList } from './contact-list';
 import { ChatWindow } from './chat-window';
 import { UserNav } from '../user-nav';
 import type { User, Message } from '@/lib/types';
-import { users as allUsers, messages as initialMessages } from '@/lib/data';
+import { users as initialUsers, messages as initialMessages } from '@/lib/data';
 import { AddContact } from './add-contact';
 
 interface ChatLayoutProps {
@@ -20,6 +20,9 @@ interface ChatLayoutProps {
 // For this demo, we'll use a simple in-memory store.
 let messagesStore = [...initialMessages];
 const listeners = new Set<() => void>();
+let usersStore = [...initialUsers];
+const userListeners = new Set<() => void>();
+
 
 function useMessages() {
   const [messages, setMessages] = React.useState(messagesStore);
@@ -38,11 +41,37 @@ function addMessage(message: Message) {
   listeners.forEach(l => l());
 }
 
+function useUsers() {
+  const [users, setUsers] = React.useState(usersStore);
+
+  React.useEffect(() => {
+    const listener = () => setUsers(usersStore);
+    userListeners.add(listener);
+    return () => userListeners.delete(listener);
+  }, []);
+
+  return users;
+}
+
+function addUser(user: User) {
+    if (!usersStore.some(u => u.id === user.id)) {
+        usersStore = [...usersStore, user];
+        userListeners.forEach(l => l());
+    }
+}
+
+
 export function ChatLayout({ user }: ChatLayoutProps) {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const messages = useMessages();
-  const [contacts, setContacts] = React.useState<User[]>(allUsers.filter((u) => u.id !== user.id));
+  const allUsers = useUsers();
+  
+  React.useEffect(() => {
+    addUser(user);
+  }, [user]);
+
+  const contacts = allUsers.filter((u) => u.id !== user.id);
 
   const handleSendMessage = (content: string) => {
     if (!selectedUser) return;
@@ -57,9 +86,7 @@ export function ChatLayout({ user }: ChatLayoutProps) {
   };
 
   const handleAddContact = (newUser: User) => {
-    if (!contacts.some(c => c.id === newUser.id)) {
-        setContacts(prev => [...prev, newUser]);
-    }
+    addUser(newUser);
     setSelectedUser(newUser);
   };
   
@@ -90,6 +117,7 @@ export function ChatLayout({ user }: ChatLayoutProps) {
             messages={messages.filter(m => (m.senderId === user.id && m.receiverId === selectedUser?.id) || (m.senderId === selectedUser?.id && m.receiverId === user.id))}
             currentUser={user}
             onSendMessage={handleSendMessage}
+            allUsers={allUsers}
         />
       </SidebarInset>
     </SidebarProvider>

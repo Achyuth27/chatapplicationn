@@ -2,17 +2,17 @@
 
 import { cn } from "@/lib/utils";
 import { UserAvatar } from "../user-avatar";
-import { users } from "@/lib/data";
 import type { User, Message } from "@/lib/types";
 
 interface ChatMessageProps {
   message: Message;
   currentUser: User;
+  allUsers: User[];
 }
 
-export function ChatMessage({ message, currentUser }: ChatMessageProps) {
+export function ChatMessage({ message, currentUser, allUsers }: ChatMessageProps) {
   const isCurrentUser = message.senderId === currentUser.id;
-  const sender = users.find(user => user.id === message.senderId);
+  const sender = allUsers.find(user => user.id === message.senderId);
 
   return (
     <div className={cn("flex items-end gap-2", isCurrentUser && "justify-end")}>
