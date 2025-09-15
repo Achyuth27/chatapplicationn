@@ -28,7 +28,6 @@ export async function login(prevState: any, formData: FormData) {
 
   const { email, password } = validatedFields.data;
 
-  // In a real app, you would verify against a database
   const allUsersCookie = cookies().get('all-users')?.value;
   const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
   
@@ -43,7 +42,6 @@ export async function login(prevState: any, formData: FormData) {
     };
   }
   
-  // Set a session cookie
   cookies().set('auth-token', user.id, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -51,9 +49,8 @@ export async function login(prevState: any, formData: FormData) {
     path: '/',
   });
 
-  // Ensure all-users cookie is present for the next step
   if (!allUsersCookie) {
-    cookies().set('all-users', JSON.stringify(allUsers), {
+    cookies().set('all-users', JSON.stringify(initialUsers), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7,
@@ -69,17 +66,16 @@ export async function signup(prevState: any, formData: FormData) {
 
     if (!validatedFields.success) {
         return {
-        errors: validatedFields.error.flatten().fieldErrors,
+          errors: validatedFields.error.flatten().fieldErrors,
         };
     }
     
     const { username, email, password } = validatedFields.data;
     
-    // Check in cookie-stored users as well
     const allUsersCookie = cookies().get('all-users')?.value;
-    const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : [...initialUsers];
+    const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
     
-    if (allUsers.some((u: any) => u.email === email)) {
+    if (allUsers.some((u) => u.email === email)) {
         return {
             errors: {
                 email: ['An account with this email already exists.'],
@@ -87,7 +83,6 @@ export async function signup(prevState: any, formData: FormData) {
         };
     }
 
-    // "Create" user - in a real app, you'd save to DB and get an ID
     const newUserId = `user-${Date.now()}`;
     const newUser: User = {
         id: newUserId,
@@ -97,18 +92,16 @@ export async function signup(prevState: any, formData: FormData) {
         online: true,
     };
     
-    allUsers.push(newUser);
+    const updatedUsers = [...allUsers, newUser];
 
-    // Set a session cookie
     cookies().set('auth-token', newUser.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7, // One week
+        maxAge: 60 * 60 * 24 * 7,
         path: '/',
     });
     
-    // Store the updated user list in a cookie
-    cookies().set('all-users', JSON.stringify(allUsers), {
+    cookies().set('all-users', JSON.stringify(updatedUsers), {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7,
@@ -121,6 +114,5 @@ export async function signup(prevState: any, formData: FormData) {
 
 export async function logout() {
   cookies().delete('auth-token');
-  cookies().delete('all-users');
   redirect('/login');
 }

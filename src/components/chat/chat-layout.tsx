@@ -6,7 +6,7 @@ import { ContactList } from './contact-list';
 import { ChatWindow } from './chat-window';
 import { UserNav } from '../user-nav';
 import type { User, Message } from '@/lib/types';
-import { messages as initialMessages, users as initialUsers } from '@/lib/data';
+import { messages as initialMessages } from '@/lib/data';
 import { AddContact } from './add-contact';
 import { SidebarProvider } from '../ui/sidebar';
 
@@ -19,15 +19,12 @@ interface ChatLayoutProps {
 // For this demo, we'll use a simple in-memory store.
 let messagesStore = [...initialMessages];
 const listeners = new Set<() => void>();
-let usersStore: User[] = [];
-const userListeners = new Set<() => void>();
-
 
 function useMessages() {
   const [messages, setMessages] = React.useState(messagesStore);
 
   React.useEffect(() => {
-    const listener = () => setMessages(messagesStore);
+    const listener = () => setMessages([...messagesStore]);
     listeners.add(listener);
     return () => listeners.delete(listener);
   }, []);
@@ -40,35 +37,13 @@ function addMessage(message: Message) {
   listeners.forEach(l => l());
 }
 
-function useUsers(initialUsers: User[]) {
-  const [users, setUsers] = React.useState(initialUsers);
-
-  React.useEffect(() => {
-    usersStore = initialUsers;
-    const listener = () => setUsers([...usersStore]);
-    userListeners.add(listener);
-    // Initial sync
-    listener();
-    return () => userListeners.delete(listener);
-  }, [initialUsers]);
-
-  return users;
-}
-
-function addUser(user: User) {
-    if (!usersStore.some(u => u.id === user.id)) {
-        usersStore = [...usersStore, user];
-        userListeners.forEach(l => l());
-    }
-}
-
-
-export function ChatLayout({ user, allUsers: initialAllUsers }: ChatLayoutProps) {
+export function ChatLayout({ user, allUsers }: ChatLayoutProps) {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const messages = useMessages();
-  const allUsers = useUsers(initialAllUsers);
   
-  const contacts = allUsers.filter((u) => u.id !== user.id);
+  const [currentUsers, setCurrentUsers] = React.useState(allUsers);
+
+  const contacts = currentUsers.filter((u) => u.id !== user.id);
 
   const handleSendMessage = (content: string) => {
     if (!selectedUser) return;
@@ -83,7 +58,10 @@ export function ChatLayout({ user, allUsers: initialAllUsers }: ChatLayoutProps)
   };
 
   const handleAddContact = (newUser: User) => {
-    addUser(newUser);
+    // In a real app this would be an API call
+    if (!currentUsers.some(u => u.id === newUser.id)) {
+        setCurrentUsers(prev => [...prev, newUser]);
+    }
     setSelectedUser(newUser);
   };
   
@@ -99,7 +77,7 @@ export function ChatLayout({ user, allUsers: initialAllUsers }: ChatLayoutProps)
         </SidebarHeader>
         <SidebarContent>
             <div className="p-2 group-data-[collapsible=icon]:hidden">
-                <AddContact allUsers={allUsers} onAddContact={handleAddContact} currentUser={user} />
+                <AddContact allUsers={currentUsers} onAddContact={handleAddContact} currentUser={user} />
             </div>
             <ContactList 
                 contacts={contacts}
@@ -114,7 +92,7 @@ export function ChatLayout({ user, allUsers: initialAllUsers }: ChatLayoutProps)
             messages={messages.filter(m => (m.senderId === user.id && m.receiverId === selectedUser?.id) || (m.senderId === selectedUser?.id && m.receiverId === user.id))}
             currentUser={user}
             onSendMessage={handleSendMessage}
-            allUsers={allUsers}
+            allUsers={currentUsers}
         />
       </SidebarInset>
     </SidebarProvider>
