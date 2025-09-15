@@ -4,7 +4,7 @@ import { ChatLayout } from '@/components/chat/chat-layout';
 import { users as initialUsers } from '@/lib/data';
 import type { User } from '@/lib/types';
 
-export default function Home() {
+export default async function Home() {
   const authToken = cookies().get('auth-token')?.value;
 
   // The middleware already handles the case where there is no token.
