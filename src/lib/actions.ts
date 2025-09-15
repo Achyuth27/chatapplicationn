@@ -26,7 +26,7 @@ export async function login(prevState: any, formData: FormData) {
     };
   }
 
-  const { email, password } = validatedFields.data;
+  const { email } = validatedFields.data;
 
   const allUsersCookie = cookies().get('all-users')?.value;
   const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
@@ -49,7 +49,6 @@ export async function login(prevState: any, formData: FormData) {
     path: '/',
   });
 
-  // Always ensure the cookie is set with the most current user list available.
   cookies().set('all-users', JSON.stringify(allUsers), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -69,7 +68,7 @@ export async function signup(prevState: any, formData: FormData) {
         };
     }
     
-    const { username, email, password } = validatedFields.data;
+    const { username, email } = validatedFields.data;
     
     const allUsersCookie = cookies().get('all-users')?.value;
     const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
@@ -106,7 +105,6 @@ export async function signup(prevState: any, formData: FormData) {
         maxAge: 60 * 60 * 24 * 7,
         path: '/',
     });
-
 
     redirect('/');
 }
