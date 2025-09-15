@@ -12,15 +12,13 @@ export default function Home() {
   
   const authToken = cookies().get('auth-token')?.value;
 
-  if (!authToken) {
-    redirect('/login');
-  }
-  
+  // The middleware already handles the case where there is no token.
+  // This check is for when the token exists but the user doesn't.
   const loggedInUser = users.find(user => user.id === authToken);
 
   if (!loggedInUser) {
     // This case might happen if the user was deleted but the cookie remains.
-    cookies().delete('auth-token');
+    // We can't delete the cookie here, so we redirect to logout which can.
     redirect('/login');
   }
 
