@@ -8,6 +8,7 @@ export const users: User[] = [
   { id: '5', name: 'Eve', email: 'eve@example.com', avatar: 'https://picsum.photos/seed/5/100/100', online: true },
   { id: '6', name: 'Frank', email: 'frank@example.com', avatar: 'https://picsum.photos/seed/6/100/100', online: true },
   { id: '7', name: 'Grace', email: 'grace@example.com', avatar: 'https://picsum.photos/seed/7/100/100', online: false },
+  { id: '8', name: 'Jake', email: 'jakey@gmail.com', avatar: 'https://picsum.photos/seed/8/100/100', online: true },
 ];
 
 export const messages: Message[] = [
