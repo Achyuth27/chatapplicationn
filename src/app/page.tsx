@@ -1,20 +1,19 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { ChatLayout } from '@/components/chat/chat-layout';
-import { users } from '@/lib/data';
+import { users as initialUsers } from '@/lib/data';
+import type { User } from '@/lib/types';
 
 export default function Home() {
-  const layout = cookies().get("react-resizable-panels:layout");
-  const collapsed = cookies().get("react-resizable-panels:collapsed");
-
-  const defaultLayout = layout ? JSON.parse(layout.value) : undefined;
-  const defaultCollapsed = collapsed ? JSON.parse(collapsed.value) : undefined;
-  
   const authToken = cookies().get('auth-token')?.value;
 
   // The middleware already handles the case where there is no token.
   // This check is for when the token exists but the user doesn't.
-  const loggedInUser = users.find(user => user.id === authToken);
+  
+  const allUsersCookie = cookies().get('all-users')?.value;
+  const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
+  
+  const loggedInUser = allUsers.find(user => user.id === authToken);
 
   if (!loggedInUser) {
     // This case might happen if the user was deleted but the cookie remains.
@@ -25,10 +24,8 @@ export default function Home() {
   return (
     <main className="h-screen w-full">
       <ChatLayout
-        defaultLayout={defaultLayout}
-        defaultCollapsed={defaultCollapsed}
-        navCollapsedSize={8}
         user={loggedInUser}
+        allUsers={allUsers}
       />
     </main>
   );

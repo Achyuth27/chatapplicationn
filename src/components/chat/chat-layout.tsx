@@ -1,26 +1,25 @@
 'use client';
 
 import * as React from 'react';
-import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
+import { Sidebar, SidebarHeader, SidebarContent, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { ContactList } from './contact-list';
 import { ChatWindow } from './chat-window';
 import { UserNav } from '../user-nav';
 import type { User, Message } from '@/lib/types';
-import { users as initialUsers, messages as initialMessages } from '@/lib/data';
+import { messages as initialMessages } from '@/lib/data';
 import { AddContact } from './add-contact';
+import { SidebarProvider } from '../ui/sidebar';
 
 interface ChatLayoutProps {
-  defaultLayout: number[] | undefined;
-  defaultCollapsed: boolean | undefined;
-  navCollapsedSize: number;
   user: User;
+  allUsers: User[];
 }
 
 // In a real app, this would be a proper state management solution.
 // For this demo, we'll use a simple in-memory store.
 let messagesStore = [...initialMessages];
 const listeners = new Set<() => void>();
-let usersStore = [...initialUsers];
+let usersStore: User[] = [];
 const userListeners = new Set<() => void>();
 
 
@@ -45,7 +44,7 @@ function useUsers() {
   const [users, setUsers] = React.useState(usersStore);
 
   React.useEffect(() => {
-    const listener = () => setUsers(usersStore);
+    const listener = () => setUsers([...usersStore]);
     userListeners.add(listener);
     return () => userListeners.delete(listener);
   }, []);
@@ -61,16 +60,16 @@ function addUser(user: User) {
 }
 
 
-export function ChatLayout({ user }: ChatLayoutProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
+export function ChatLayout({ user, allUsers: initialAllUsers }: ChatLayoutProps) {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const messages = useMessages();
-  const allUsers = useUsers();
   
   React.useEffect(() => {
-    addUser(user);
-  }, [user]);
+    usersStore = initialAllUsers;
+    userListeners.forEach(l => l());
+  }, [initialAllUsers]);
 
+  const allUsers = useUsers();
   const contacts = allUsers.filter((u) => u.id !== user.id);
 
   const handleSendMessage = (content: string) => {
