@@ -7,8 +7,8 @@ import type { User } from '@/lib/types';
 export default async function Home() {
   const authToken = cookies().get('auth-token')?.value;
 
-  // The middleware already handles the case where there is no token.
-  // This check is for when the token exists but the user doesn't.
+  // The middleware ensures an auth-token exists, so we don't need to check here.
+  // This page now handles what happens if that token is invalid.
   
   const allUsersCookie = cookies().get('all-users')?.value;
   const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
@@ -16,8 +16,8 @@ export default async function Home() {
   const loggedInUser = allUsers.find(user => user.id === authToken);
 
   if (!loggedInUser) {
-    // This case might happen if the user was deleted but the cookie remains.
-    // We can't delete the cookie here, so we redirect to logout which can.
+    // If the token is invalid or the user was deleted,
+    // clear the cookie by redirecting to the logout route.
     redirect('/logout');
   }
 
