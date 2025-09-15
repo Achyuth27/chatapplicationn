@@ -30,7 +30,7 @@ export function ContactList({ contacts, selectedUser, onSelectUser }: ContactLis
                             className="justify-start"
                         >
                             <UserAvatar user={contact} className="w-8 h-8"/>
-                            <span>{contact.name}</span>
+                            <span className="truncate">{contact.name}</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 ))}

@@ -17,12 +17,14 @@ interface ChatWindowProps {
 
 export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage }: ChatWindowProps) {
     const scrollAreaRef = React.useRef<HTMLDivElement>(null);
+    const viewportRef = React.useRef<HTMLDivElement>(null);
 
     React.useEffect(() => {
-        if(scrollAreaRef.current) {
-            scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+        const viewport = viewportRef.current;
+        if (viewport) {
+            viewport.scrollTop = viewport.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, selectedUser]);
 
   if (!selectedUser) {
     return (
@@ -30,7 +32,7 @@ export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage 
         <MessageSquareDashed className="h-16 w-16 text-muted-foreground" />
         <div className="text-center">
           <h2 className="text-xl font-medium text-foreground">No conversation selected</h2>
-          <p className="text-muted-foreground">Select a contact to start chatting.</p>
+          <p className="text-muted-foreground">Select a contact to start chatting or add a new one.</p>
         </div>
       </div>
     );
@@ -47,7 +49,7 @@ export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage 
           </p>
         </div>
       </div>
-      <ScrollArea className="flex-1" ref={scrollAreaRef}>
+      <ScrollArea className="flex-1" viewportRef={viewportRef}>
         <div className="p-4 space-y-4">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} currentUser={currentUser} />
