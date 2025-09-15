@@ -6,7 +6,7 @@ import { ContactList } from './contact-list';
 import { ChatWindow } from './chat-window';
 import { UserNav } from '../user-nav';
 import type { User, Message } from '@/lib/types';
-import { messages as initialMessages } from '@/lib/data';
+import { messages as initialMessages, users as initialUsers } from '@/lib/data';
 import { AddContact } from './add-contact';
 import { SidebarProvider } from '../ui/sidebar';
 
@@ -40,14 +40,17 @@ function addMessage(message: Message) {
   listeners.forEach(l => l());
 }
 
-function useUsers() {
-  const [users, setUsers] = React.useState(usersStore);
+function useUsers(initialUsers: User[]) {
+  const [users, setUsers] = React.useState(initialUsers);
 
   React.useEffect(() => {
+    usersStore = initialUsers;
     const listener = () => setUsers([...usersStore]);
     userListeners.add(listener);
+    // Initial sync
+    listener();
     return () => userListeners.delete(listener);
-  }, []);
+  }, [initialUsers]);
 
   return users;
 }
@@ -63,13 +66,8 @@ function addUser(user: User) {
 export function ChatLayout({ user, allUsers: initialAllUsers }: ChatLayoutProps) {
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
   const messages = useMessages();
+  const allUsers = useUsers(initialAllUsers);
   
-  React.useEffect(() => {
-    usersStore = initialAllUsers;
-    userListeners.forEach(l => l());
-  }, [initialAllUsers]);
-
-  const allUsers = useUsers();
   const contacts = allUsers.filter((u) => u.id !== user.id);
 
   const handleSendMessage = (content: string) => {
