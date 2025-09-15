@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     status: 307, // Use 307 for temporary redirect
   });
 
-  // Ensure cookies are cleared on the client
+  // Ensure cookies are cleared on the client by setting them in the response headers
   response.cookies.delete('auth-token');
   response.cookies.delete('all-users');
 
