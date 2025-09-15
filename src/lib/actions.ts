@@ -3,7 +3,8 @@
 import { z } from 'zod';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { users } from './data';
+import { users as initialUsers } from './data';
+import type { User } from './types';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -28,24 +29,12 @@ export async function login(prevState: any, formData: FormData) {
   const { email, password } = validatedFields.data;
 
   // In a real app, you would verify against a database
-  const user = users.find((u) => u.email === email);
+  const allUsersCookie = cookies().get('all-users')?.value;
+  const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : initialUsers;
+  
+  const user = allUsers.find((u) => u.email === email);
+  
   if (!user) {
-    // Also check for new users that might not be in the initial list
-    const allUsersCookie = cookies().get('all-users')?.value;
-    if (allUsersCookie) {
-        const allUsers = JSON.parse(allUsersCookie);
-        const dynamicUser = allUsers.find((u: any) => u.email === email);
-        if (dynamicUser) {
-            cookies().set('auth-token', dynamicUser.id, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 60 * 60 * 24 * 7, // One week
-                path: '/',
-            });
-            redirect('/');
-        }
-    }
-
     return {
       errors: {
         email: ['Invalid credentials'],
@@ -62,6 +51,16 @@ export async function login(prevState: any, formData: FormData) {
     path: '/',
   });
 
+  // Ensure all-users cookie is present for the next step
+  if (!allUsersCookie) {
+    cookies().set('all-users', JSON.stringify(allUsers), {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24 * 7,
+        path: '/',
+    });
+  }
+
   redirect('/');
 }
 
@@ -75,19 +74,10 @@ export async function signup(prevState: any, formData: FormData) {
     }
     
     const { username, email, password } = validatedFields.data;
-
-    // Check if user already exists in the base list
-    if (users.some((u) => u.email === email)) {
-        return {
-            errors: {
-                email: ['An account with this email already exists.'],
-            },
-        };
-    }
     
     // Check in cookie-stored users as well
     const allUsersCookie = cookies().get('all-users')?.value;
-    const allUsers = allUsersCookie ? JSON.parse(allUsersCookie) : [...users];
+    const allUsers: User[] = allUsersCookie ? JSON.parse(allUsersCookie) : [...initialUsers];
     
     if (allUsers.some((u: any) => u.email === email)) {
         return {
@@ -99,7 +89,7 @@ export async function signup(prevState: any, formData: FormData) {
 
     // "Create" user - in a real app, you'd save to DB and get an ID
     const newUserId = `user-${Date.now()}`;
-    const newUser = {
+    const newUser: User = {
         id: newUserId,
         name: username,
         email,
