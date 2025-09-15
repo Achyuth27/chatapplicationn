@@ -20,6 +20,11 @@ interface UserNavProps {
 }
 
 export function UserNav({ user }: UserNavProps) {
+  
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -42,14 +47,10 @@ export function UserNav({ user }: UserNavProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <form action={logout}>
-          <DropdownMenuItem asChild>
-            <button className="w-full text-left">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
-            </button>
-          </DropdownMenuItem>
-        </form>
+        <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
