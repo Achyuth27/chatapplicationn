@@ -41,17 +41,17 @@ export function ChatWindow({ selectedUser, messages, currentUser, onSendMessage,
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-14 items-center gap-3 border-b bg-card px-4">
+      <div className="flex h-16 items-center gap-4 border-b bg-card px-6">
         <UserAvatar user={selectedUser} />
         <div>
-          <h2 className="font-semibold">{selectedUser.name}</h2>
+          <h2 className="font-semibold text-lg">{selectedUser.name}</h2>
           <p className="text-sm text-muted-foreground">
             {selectedUser.online ? 'Online' : 'Offline'}
           </p>
         </div>
       </div>
       <ScrollArea className="flex-1" viewportRef={viewportRef}>
-        <div className="p-4 space-y-4">
+        <div className="p-6 space-y-6">
           {messages.map((message) => (
             <ChatMessage key={message.id} message={message} currentUser={currentUser} allUsers={allUsers} />
           ))}

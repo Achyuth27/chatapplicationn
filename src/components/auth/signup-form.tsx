@@ -24,9 +24,9 @@ export function SignupForm() {
   const [state, dispatch] = useActionState(signup, initialState);
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="space-y-1 text-center">
-        <div className="flex justify-center">
+    <Card className="w-full max-w-sm border-0 shadow-xl">
+      <CardHeader className="space-y-2 text-center">
+        <div className="flex justify-center mb-2">
             <Logo />
         </div>
         <CardTitle className="text-2xl">Create an Account</CardTitle>
@@ -54,7 +54,7 @@ export function SignupForm() {
         <CardFooter>
           <div className="w-full text-center text-sm">
             Already have an account?{' '}
-            <Link href="/login" className="underline hover:text-primary">
+            <Link href="/login" className="underline text-primary hover:text-primary/80">
               Sign in
             </Link>
           </div>

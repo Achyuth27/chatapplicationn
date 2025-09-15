@@ -24,9 +24,9 @@ export function LoginForm() {
   const [state, dispatch] = useActionState(login, initialState);
 
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="space-y-1 text-center">
-        <div className="flex justify-center">
+    <Card className="w-full max-w-sm border-0 shadow-xl">
+      <CardHeader className="space-y-2 text-center">
+        <div className="flex justify-center mb-2">
             <Logo />
         </div>
         <CardTitle className="text-2xl">Welcome Back</CardTitle>
@@ -49,7 +49,7 @@ export function LoginForm() {
         <CardFooter className="flex-col">
           <div className="text-center text-sm">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="underline hover:text-primary">
+            <Link href="/signup" className="underline text-primary hover:text-primary/80">
               Sign up
             </Link>
           </div>

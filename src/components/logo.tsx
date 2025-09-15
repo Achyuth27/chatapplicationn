@@ -7,8 +7,10 @@ type LogoProps = {
 
 export function Logo({ className }: LogoProps) {
   return (
-    <div className={cn("flex items-center gap-2", className)}>
-      <MessageSquare className="h-8 w-8 text-primary" />
+    <div className={cn("flex items-center gap-3", className)}>
+      <div className="bg-primary rounded-md p-2">
+        <MessageSquare className="h-6 w-6 text-primary-foreground" />
+      </div>
       <h1 className="text-2xl font-bold text-foreground">WhisperNet</h1>
     </div>
   );
