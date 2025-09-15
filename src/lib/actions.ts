@@ -71,9 +71,18 @@ export async function signup(prevState: any, formData: FormData) {
 
     // "Create" user - in a real app, you'd save to DB and get an ID
     const newUserId = (users.length + 1).toString();
+    const newUser = {
+        id: newUserId,
+        name: username,
+        email,
+        avatar: `https://picsum.photos/seed/${newUserId}/100/100`,
+        online: true,
+    };
+    users.push(newUser);
+
 
     // Set a session cookie
-    cookies().set('auth-token', newUserId, {
+    cookies().set('auth-token', newUser.id, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         maxAge: 60 * 60 * 24 * 7, // One week
