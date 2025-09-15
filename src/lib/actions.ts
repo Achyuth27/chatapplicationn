@@ -49,14 +49,13 @@ export async function login(prevState: any, formData: FormData) {
     path: '/',
   });
 
-  if (!allUsersCookie) {
-    cookies().set('all-users', JSON.stringify(initialUsers), {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 60 * 60 * 24 * 7,
-        path: '/',
-    });
-  }
+  // Always ensure the cookie is set with the most current user list available.
+  cookies().set('all-users', JSON.stringify(allUsers), {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+  });
 
   redirect('/');
 }
